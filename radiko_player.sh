@@ -9,10 +9,6 @@ keyfile=./authkey.png
 
 if [ $# -eq 1 ]; then
   channel=$1
-  output=./$1.flv
-elif [ $# -eq 2 ]; then
-  channel=$1
-  output=$2
 else
   echo "usage : $0 channel_name [outputfile]"
   exit 1
@@ -146,7 +142,7 @@ echo -C $authtoken
 #
 # rtmpgw
 #
-rtmpgw --rtmp "${url_parts[0]}" --app "${url_parts[1]}" --playpath "${url_parts[2]}" --swfVfy "$playerurl" --conn S:"" --conn S:"" --conn S:"" --conn "S:$authtoken" --live --device 127.0.0.1 --sport $output --quiet &
+rtmpdump --rtmp "${url_parts[0]}" --app "${url_parts[1]}" --playpath "${url_parts[2]}" --swfVfy "$playerurl" --conn S:"" --conn S:"" --conn S:"" --conn "S:$authtoken" --live --quiet | mplayer -ao alsa:device=hw=1.0 -cache 500 - &
 
 popd
 

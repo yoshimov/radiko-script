@@ -8,11 +8,5 @@ CH=$1
 DIR=$(dirname $0)
 
 . ${DIR}/radiko_server.sh $CH $PORT
-
 . ${DIR}/radiko_client.sh $PORT
-
-sleep 3600
-
-pkill mplayer
-pkill rtmpgw
 
