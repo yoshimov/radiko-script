@@ -2,6 +2,8 @@
 
 pushd $(dirname $0)
 
+echo "started: $(date)"
+
 #playerurl=http://radiko.jp/player/swf/player_3.0.0.01.swf
 playerurl=http://radiko.jp/player/swf/player_4.0.0.00.swf
 playerfile=./player.swf
@@ -10,7 +12,7 @@ keyfile=./authkey.png
 if [ $# -eq 1 ]; then
   channel=$1
 else
-  echo "usage : $0 channel_name [outputfile]"
+  echo "usage : $0 channel_name [duraton sec]"
   exit 1
 fi
 
@@ -121,11 +123,7 @@ echo "get stream-url"
 # get stream-url
 #
 
-if [ -f ${channel}.xml ]; then
-  rm -f ${channel}.xml
-fi
-
-wget -q "http://radiko.jp/v2/station/stream/${channel}.xml"
+wget -O ${channel}.xml -q "http://radiko.jp/v2/station/stream/${channel}.xml"
 
 stream_url=`echo "cat /url/item[1]/text()" | xmllint --shell ${channel}.xml | tail -2 | head -1`
 url_parts=(`echo ${stream_url} | perl -pe 's!^(.*)://(.*?)/(.*)/(.*?)$/!$1://$2 $3 $4!'`)
@@ -139,10 +137,15 @@ echo --playpath ${url_parts[2]}
 echo -W $playerurl
 echo -C $authtoken
 
+if [ -n "$2" ]; then
+  echo "stop timer: $2"
+  . tuner_stop.sh $2 &
+fi
+
 #
 # rtmpgw
 #
-rtmpdump --rtmp "${url_parts[0]}" --app "${url_parts[1]}" --playpath "${url_parts[2]}" --swfVfy "$playerurl" --conn S:"" --conn S:"" --conn S:"" --conn "S:$authtoken" --live --quiet | mplayer -ao alsa:device=hw=1.0 -cache 500 - &
+rtmpdump --rtmp "${url_parts[0]}" --app "${url_parts[1]}" --playpath "${url_parts[2]}" --swfVfy "$playerurl" --conn S:"" --conn S:"" --conn S:"" --conn "S:$authtoken" --live --quiet | mplayer -ao alsa:device=hw=1.0 -cache 500 -
 
 popd
 
