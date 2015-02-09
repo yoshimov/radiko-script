@@ -9,7 +9,7 @@ playerurl=http://radiko.jp/player/swf/player_4.0.0.00.swf
 playerfile=./player.swf
 keyfile=./authkey.png
 
-if [ $# -eq 1 ]; then
+if [ -n "$1" ]; then
   channel=$1
 else
   echo "usage : $0 channel_name [duraton sec]"
@@ -137,15 +137,15 @@ echo --playpath ${url_parts[2]}
 echo -W $playerurl
 echo -C $authtoken
 
-if [ -n "$2" ]; then
-  echo "stop timer: $2"
-  . tuner_stop.sh $2 &
-fi
+#if [ -n "$2" ]; then
+#  echo "stop timer: $2"
+#  . tuner_stop.sh $2 &
+#fi
 
 #
 # rtmpgw
 #
-rtmpdump --rtmp "${url_parts[0]}" --app "${url_parts[1]}" --playpath "${url_parts[2]}" --swfVfy "$playerurl" --conn S:"" --conn S:"" --conn S:"" --conn "S:$authtoken" --live --quiet | mplayer -ao alsa:device=hw=1.0 -cache 500 -
+rtmpdump --rtmp "${url_parts[0]}" --app "${url_parts[1]}" --playpath "${url_parts[2]}" --swfVfy "$playerurl" --conn S:"" --conn S:"" --conn S:"" --conn "S:$authtoken" --live --quiet --stop $2 | mplayer -ao alsa:device=hw=1.0 -cache 500 -
 
 popd
 
